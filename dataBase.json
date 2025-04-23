@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "id": "fea1",
+      "name": "Brennan Pitts",
+      "email": "ciloz@mailinator.com",
+      "phone": "+1 (431) 812-143",
+      "image": "https://www.cyzymehybu.cc",
+      "status": false
+    },
+    {
+      "id": "148b",
+      "name": "Brennan Pitts",
+      "email": "ciloz@mailinator.com",
+      "phone": "+1 (431) 812-1433",
+      "image": "https://www.cyzymehybu.cc",
+      "status": false
+    },
+    {
+      "id": "364c",
+      "name": "Allegra Hoover",
+      "email": "musacaba@mailinator.com",
+      "phone": "+1 (868) 493-8801",
+      "image": "https://www.mecikecucofeg.tv",
+      "status": true
+    }
+  ]
+}
