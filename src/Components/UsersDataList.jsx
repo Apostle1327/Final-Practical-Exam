@@ -1,39 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import api from "../Services/api";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-const UsersDataList = () => {
-  const [users, setUsers] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+const UsersDataList = ({ users = [], setUsers }) => {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get("/users?status=true");
-      // console.log("Fetched users:", res.data);
-      setUsers(res.data);
-      setError(null);
-    } catch (err) {
-      setError("Failed to fetch users.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const filteredUsers = users.filter((user) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      user?.name?.toLowerCase().includes(term) ||
+      user?.email?.toLowerCase().includes(term) ||
+      user?.phone?.toLowerCase().includes(term)
+    );
+  });
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
 
   const executePurge = async (id) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      try {
-        await api.patch(`/users/${id}`, { status: false });
-        fetchUsers();
-      } catch (err) {
-        setError("Failed to delete user.");
-      }
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    try {
+      await api.delete(`/users/${id}`);
+      setUsers((prev) => prev.filter((user) => user.id !== id));
+      toast.success("User deleted successfully!");
+    } catch {
+      toast.error("Failed to delete user.");
     }
   };
 
@@ -41,28 +38,40 @@ const UsersDataList = () => {
     navigate(`/edit/${id}`);
   };
 
-  const goToAdd = () => {
-    navigate("/add");
+  const handleItemsChange = (e) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1);
   };
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
-
   return (
-    <div className="container my-4" style={{ backgroundColor: "#ffffff" }}>
+    <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Active Users</h2>
-        <button onClick={goToAdd} className="btn btn-primary">
-          + Add User
-        </button>
+        <input
+          type="text"
+          className="form-control me-2"
+          style={{ maxWidth: "400px" }}
+          placeholder="Search by name, email or phone"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
+        />
+        <select
+          className="form-select"
+          style={{ maxWidth: "120px" }}
+          value={itemsPerPage}
+          onChange={handleItemsChange}
+        >
+          <option value="5">Show 5</option>
+          <option value="10">Show 10</option>
+          <option value="15">Show 15</option>
+        </select>
       </div>
 
-      {error && <p className="text-danger">{error}</p>}
-
       <div className="table-responsive">
-        <table className="table table-striped">
-          <thead className="table-primary">
+        <table className="table table-bordered table-hover text-center">
+          <thead className="table-light">
             <tr>
               <th>Avatar</th>
               <th>Name</th>
@@ -72,13 +81,13 @@ const UsersDataList = () => {
             </tr>
           </thead>
           <tbody>
-            {users.length > 0 ? (
-              users.map((u) => (
-                <tr key={u.id}>
+            {paginatedUsers.length > 0 ? (
+              paginatedUsers.map(({ id, name, email, phone, image }) => (
+                <tr key={id}>
                   <td>
                     <img
-                      src={u.image || "/path/to/default-avatar.jpg"}
-                      alt={u.name || "User Avatar"}
+                      src={image}
+                      alt={name}
                       className="rounded-circle"
                       style={{
                         width: "50px",
@@ -87,19 +96,19 @@ const UsersDataList = () => {
                       }}
                     />
                   </td>
-                  <td>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>{u.phone}</td>
+                  <td>{name}</td>
+                  <td>{email}</td>
+                  <td>{phone}</td>
                   <td>
                     <button
-                      onClick={() => executeUpdate(u.id)}
-                      className="btn btn-sm btn-secondary me-2"
+                      className="btn btn-sm btn-success me-2"
+                      onClick={() => executeUpdate(id)}
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => executePurge(u.id)}
                       className="btn btn-sm btn-danger"
+                      onClick={() => executePurge(id)}
                     >
                       Delete
                     </button>
@@ -108,13 +117,38 @@ const UsersDataList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="text-center py-4">
-                  No active users found.
+                <td colSpan="5" className="text-center py-3">
+                  No users found.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="d-flex justify-content-center mt-3">
+        <nav>
+          <ul className="pagination">
+            {[...Array(totalPages)].map((_, index) => {
+              const page = index + 1;
+              return (
+                <li
+                  key={page}
+                  className={`page-item ${
+                    currentPage === page ? "active" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
       </div>
     </div>
   );
