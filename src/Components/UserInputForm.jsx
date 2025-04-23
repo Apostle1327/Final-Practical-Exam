@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import UsersDataList from "./UsersDataList";
@@ -7,6 +7,7 @@ import api from "../Services/api";
 
 const UserInputForm = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const isEditing = Boolean(id);
 
   const [userData, setUserData] = useState({
@@ -15,7 +16,6 @@ const UserInputForm = () => {
     phone: "",
     image: "",
   });
-
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
@@ -32,7 +32,6 @@ const UserInputForm = () => {
         setLoading(false);
       }
     };
-
     fetchUsers();
   }, []);
 
@@ -58,51 +57,47 @@ const UserInputForm = () => {
   };
 
   const validateForm = () => {
-    const { name, email, phone, image } = userData;
-
+    const { name, email, phone } = userData;
     if (name.trim().length < 3) {
       setError("Name must be at least 3 characters long.");
       return false;
     }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError("Invalid email format.");
       return false;
     }
-
     const phoneRegex = /^[\d\s()+-]+$/;
     if (!phoneRegex.test(phone)) {
       setError("Phone number contains invalid characters.");
       return false;
     }
-
     return true;
   };
 
   const executeSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-
     if (!validateForm()) return;
-
     setLoading(true);
+
     try {
       let newUser;
       if (isEditing) {
         await api.patch(`/users/${id}`, userData);
         newUser = { ...userData, id };
-        setUsers((prevUsers) =>
-          prevUsers.map((user) => (user.id === id ? newUser : user))
+        setUsers((prev) =>
+          prev.map((user) => (user.id === id ? newUser : user))
         );
         toast.success("User updated successfully!");
       } else {
         const res = await api.post("/users", { ...userData, status: true });
         newUser = res.data;
-        setUsers((prevUsers) => [...prevUsers, newUser]);
+        setUsers((prev) => [...prev, newUser]);
         toast.success("User added successfully!");
       }
 
+      navigate("/");
       setUserData({ name: "", email: "", phone: "", image: "" });
     } catch {
       setError("An error occurred while saving.");

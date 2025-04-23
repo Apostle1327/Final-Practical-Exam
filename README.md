@@ -40,22 +40,23 @@ This project is a React + Vite single-page application that demonstrates a compl
 ## 📂 Project Folder Structure
 
 ```jsx
-├── node_modules/
-├── public/                         # Static assets (index.html, favicon)
-├── src/
-│   ├── Components/
-│   │   ├── App.jsx                 # Main router: form at `/`, edit at `/edit/:id`
-│   │   ├── UserInputForm.jsx       # Add/Edit form + inline list
-│   │   └── UsersDataList.jsx       # Searchable, paginated user table
-│   ├── Services/
-│   │   └── api.js                  # Axios instance pointing to JSON Server
-│   ├── database.json               # JSON Server data file
-│   ├── index.jsx                   # React DOM entry point
-│   └── styles.css                  # (optional) global/custom styles
-├── .gitignore
-├── package.json
-├── package-lock.json
-└── vite.config.js                  // Vite build & dev‑server configuration
+├── node_modules/                   # Dependencies installed via npm
+├── public/                         # Public assets (accessible without build processing)
+│   └── index.html                  # HTML entry point for the React app
+├── src/                            # Source code of the application
+│   ├── Components/                 # React components for UI
+│   │   ├── App.jsx                 # Main router, handles form (`/`) and edit (`/edit/:id`) routes
+│   │   ├── UserInputForm.jsx       # Component for adding/editing a user, includes inline list of items
+│   │   └── UsersDataList.jsx       # Searchable and paginated table to display users
+│   ├── Services/                   # Services for external data/API calls
+│   │   └── api.js                  # Axios instance configured to connect to the JSON Server
+│   ├── database.json               # Mock database file for JSON Server (contains app data)
+│   ├── index.jsx                   # Application entry point, renders the root React component
+│   └── styles.css                  # (Optional) Global/custom styles for the app
+├── .gitignore                      # Specifies files and directories to ignore in Git
+├── package.json                    # Defines dependencies, scripts, and project metadata
+├── package-lock.json               # Exact dependency tree for npm
+└── vite.config.js                  # Configuration for the Vite build tool
 
 ```
 
@@ -64,13 +65,13 @@ This project is a React + Vite single-page application that demonstrates a compl
 1. **Clone the Repository:**
 
 ```bash
-
+https://github.com/Apostle1327/Final-Practical-Exam.git
 ```
 
 2. **Navigate to the Project Directory:**
 
 ```bash
-cd
+cd Final-Practical-Exam
 ```
 
 3. **Install Dependencies:**
@@ -109,7 +110,9 @@ cd
 
 # 📷 Screenshots
 
-<img width="330" alt="React Final Exam - 1" src="./src/Images/">
+<img width="330" alt="React Final Practical Exam - 1" src="./src/Images/Final React Practical Exam - 1.png">
+<img width="330" alt="React Final Practical Exam - 2" src="./src/Images/Final React Practical Exam - 2.png">
+<img width="330" alt="React Final Practical Exam - 3" src="./src/Images/Final React Practical Exam - 3.png">
 
 ## 🛠️ Technologies Used
 
